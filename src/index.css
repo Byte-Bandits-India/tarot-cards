@@ -1,0 +1,193 @@
+@import "tailwindcss";
+
+/* 
+  Custom styles for Tarot Card layout:
+  - Bounce dealing transitions
+  - Fanned arc spread for the 3 selected cards
+  - 3D card flips with individual reveal
+  - Depth-of-field blur on unselected background cards
+*/
+
+:root {
+  --card-width: 120px;
+  --card-height: 175px;
+  --card-gap-x: 18px;
+  --card-gap-y: 20px;
+  --stack-left: 584px;
+  --stack-top: 31px;
+}
+
+/* Perspective wrapper for 3D flip */
+.card-perspective {
+  perspective: 1200px;
+}
+
+/* Base card item: positioned at the deck stack by default */
+li.card-item {
+  width: var(--card-width);
+  height: var(--card-height);
+  position: absolute;
+  top: var(--stack-top);
+  left: var(--stack-left);
+  list-style: none;
+  border-radius: 10px;
+  /* Signature bouncy deal curve on position, smooth easing on elevation & blur */
+  transition: 
+    left 0.85s cubic-bezier(0.68, -0.55, 0.265, 1.5),
+    top 0.85s cubic-bezier(0.68, -0.55, 0.265, 1.5),
+    transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter 0.6s ease,
+    opacity 0.6s ease,
+    box-shadow 0.3s ease;
+  user-select: none;
+}
+
+/* Row 1 Dealt Positions (Col 0 to Col 4, Top: 31px) */
+li.card-item.dealt-0 {
+  left: 32px;
+  top: 31px;
+}
+li.card-item.dealt-1 {
+  left: 170px;
+  top: 31px;
+}
+li.card-item.dealt-2 {
+  left: 308px;
+  top: 31px;
+}
+li.card-item.dealt-3 {
+  left: 446px;
+  top: 31px;
+}
+li.card-item.dealt-4 {
+  left: 584px;
+  top: 31px;
+}
+
+/* Row 2 Dealt Positions (Col 0 to Col 4, Top: 226px) */
+li.card-item.dealt-5 {
+  left: 32px;
+  top: 226px;
+}
+li.card-item.dealt-6 {
+  left: 170px;
+  top: 226px;
+}
+li.card-item.dealt-7 {
+  left: 308px;
+  top: 226px;
+}
+li.card-item.dealt-8 {
+  left: 446px;
+  top: 226px;
+}
+li.card-item.dealt-9 {
+  left: 584px;
+  top: 226px;
+}
+
+/* Staging lift during selection phase (before 3 are picked) */
+li.card-item.card-selected-staging {
+  transform: translateY(-8px) scale(1.05);
+  z-index: 25;
+}
+
+/* 
+  FAN ARC SPREAD (when 3 cards are selected):
+  Arranges the 3 chosen cards into a curved fan/hand formation in the center of the table.
+*/
+li.card-item.fan-card-0 {
+  left: 205px !important;
+  top: 132px !important;
+  transform: rotate(-11deg) translateY(6px);
+  z-index: 51 !important;
+}
+
+li.card-item.fan-card-1 {
+  left: 308px !important;
+  top: 120px !important;
+  transform: rotate(0deg) translateY(-8px);
+  z-index: 53 !important;
+}
+
+li.card-item.fan-card-2 {
+  left: 411px !important;
+  top: 132px !important;
+  transform: rotate(11deg) translateY(6px);
+  z-index: 52 !important;
+}
+
+/* Interactive hover lift for each card in the fan */
+li.card-item.fan-card-0:hover {
+  transform: rotate(-7deg) translateY(-22px) scale(1.08) !important;
+  z-index: 65 !important;
+}
+
+li.card-item.fan-card-1:hover {
+  transform: rotate(0deg) translateY(-28px) scale(1.08) !important;
+  z-index: 65 !important;
+}
+
+li.card-item.fan-card-2:hover {
+  transform: rotate(7deg) translateY(-22px) scale(1.08) !important;
+  z-index: 65 !important;
+}
+
+/* Elevated shadows for the 3 fanned cards */
+li.card-item.fan-card-0 .card-face,
+li.card-item.fan-card-1 .card-face,
+li.card-item.fan-card-2 .card-face {
+  box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.24), 0 8px 16px -4px rgba(0, 0, 0, 0.1);
+  border-color: #262626;
+}
+
+/* Blurred effect for unselected cards when 3 cards are picked */
+li.card-item.card-blurred {
+  filter: blur(6px) grayscale(30%);
+  opacity: 0.18;
+  transform: scale(0.95);
+  pointer-events: none;
+}
+
+/* 3D Inner Flipper */
+.card-flipper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.75s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 10px;
+}
+
+.card-flipper.is-flipped {
+  transform: rotateY(180deg);
+}
+
+/* Front & Back Faces */
+.card-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background-color: #ffffff;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 2px 5px -1px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+li.card-item:hover .card-face {
+  box-shadow: 0 10px 22px -3px rgba(0, 0, 0, 0.12), 0 4px 8px -2px rgba(0, 0, 0, 0.06);
+  border-color: #d4d4d4;
+}
+
+.card-face.face-back {
+  transform: rotateY(0deg);
+}
+
+.card-face.face-front {
+  transform: rotateY(180deg);
+}
