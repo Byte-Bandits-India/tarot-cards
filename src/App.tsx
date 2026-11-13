@@ -1,7 +1,12 @@
 import { useState, useRef, useEffect } from 'react'
 import { INITIAL_CARDS, type TarotCardData } from './cardsData'
+import { Navbar, type NavbarTab } from './components/Navbar'
+import { DashboardCalendar } from './components/DashboardCalendar'
+import { ChatView, type ChatMessage } from './components/ChatView'
 
 export default function App() {
+  const [activeTab, setActiveTab] = useState<NavbarTab>('tarot')
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
   // Tracks which cards (0..11) are dealt onto the table
   const [dealtCards, setDealtCards] = useState<boolean[]>(() => new Array(INITIAL_CARDS.length).fill(false))
   // Tracks the IDs of selected cards (strictly up to 3 cards)
@@ -113,193 +118,231 @@ export default function App() {
     .map((id) => INITIAL_CARDS.find((c) => c.id === id))
     .filter((c): c is TarotCardData => Boolean(c))
 
+  const handleSendMessage = ({
+    sender,
+    text,
+    cardsShared,
+  }: {
+    sender: 'person1' | 'person2'
+    text: string
+    cardsShared?: { id: number; name: string; icon: string }[]
+  }) => {
+    const now = new Date()
+    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    const newMsg: ChatMessage = {
+      id: `msg-${Date.now()}`,
+      sender,
+      text,
+      timestamp: timeStr,
+      cardsShared,
+    }
+    setChatMessages((prev) => [...prev, newMsg])
+  }
+
+  const handleClearMessages = () => {
+    setChatMessages([])
+  }
+
   return (
-    <div className="h-screen max-h-screen w-full bg-white text-neutral-900 flex flex-col justify-between items-center p-2 sm:p-3 select-none overflow-hidden">
-      {/* Header */}
-      <header className="w-full max-w-[1440px] text-center px-2 flex-shrink-0">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-serif font-bold tracking-tight text-neutral-900">
-          Tarot Cards Spread
-        </h1>
-      </header>
+    <div className="h-screen max-h-screen w-full bg-white text-neutral-900 flex flex-col justify-between items-center select-none overflow-hidden">
+      {/* Top Navbar using NavigationMenu Component */}
+      <Navbar
+        activeTab={activeTab}
+        onSelectTab={setActiveTab}
+      />
 
-      {/* Main Viewport-Fitted Card Table Area with Full-Width Spread */}
-      <div className="w-full flex-1 flex items-center justify-center min-h-0 px-2 sm:px-6 md:px-10 py-1">
-        <div
-          className="relative w-full aspect-[16/8.2] max-h-[calc(100dvh-125px)] overflow-visible select-none"
-          style={{
-            maxWidth: 'calc((100dvh - 125px) * (16 / 8.2))',
-          }}
-        >
-          {/* Deck Slot Indicator (matches stack position: left: 84.1%, top: 3.5%) */}
-          <div
-            onClick={anyDealt && !isBusy ? handleStack : undefined}
-            className={`absolute rounded-lg sm:rounded-xl border-2 border-dashed border-neutral-200 flex flex-col items-center justify-center text-neutral-300 text-xs font-sans transition-all ${
-              isThreeSelected ? 'opacity-20 blur-[1px]' : ''
-            } ${
-              anyDealt && !isBusy ? 'hover:border-neutral-400 hover:text-neutral-500 cursor-pointer' : 'pointer-events-none'
-            }`}
-            style={{
-              left: '84.1%',
-              top: '3.5%',
-              width: '14.8%',
-              height: '45.5%',
-            }}
-            title={anyDealt ? 'Click to make a deck' : undefined}
-          >
-            <span className="text-base sm:text-2xl opacity-40">🂠</span>
-            <span className="mt-0.5 font-medium text-[9px] sm:text-[11px] leading-tight text-center px-1">
-              {anyDealt ? 'Make Deck' : 'Deck Stack'}
-            </span>
-          </div>
-
-          {/* Cards List */}
-          <ul className="relative w-full h-full list-none p-0 m-0 card-perspective">
-            {INITIAL_CARDS.map((card, index) => {
-              const isDealt = dealtCards[index]
-              const isSelected = selectedCardIds.includes(card.id)
-              const isFlipped = revealedCardIds.includes(card.id)
-              const isDeckStacked = !anyDealt
-              const selectionOrder = selectedCardIds.indexOf(card.id)
-
-              // Stack offset when sitting in deck
-              const stackZIndex = 25 - index
-              const stackOffset = !isDealt
-                ? {
-                    transform: `translateY(${-index * 0.5}px) translateX(${index * 0.2}px)`,
-                    zIndex: stackZIndex,
-                  }
-                : undefined
-
-              // Determine visual presentation state
-              let stateClass = ''
-              if (isDealt) {
-                if (isThreeSelected) {
-                  if (isSelected) {
-                    const fanIdx = selectedCardIds.indexOf(card.id)
-                    stateClass = `fan-card-${fanIdx}`
-                  } else {
-                    stateClass = 'card-blurred'
-                  }
-                } else if (isSelected) {
-                  stateClass = 'card-selected-staging'
-                }
-              }
-
-              return (
-                <li
-                  key={card.id}
-                  onClick={() => handleCardClick(card.id)}
-                  className={`card card-item select-none ${
-                    isDealt ? `dealt-${index}` : ''
-                  } ${stateClass} ${
-                    isDeckStacked
-                      ? 'cursor-pointer hover:-translate-y-1'
-                      : isThreeSelected && !isSelected
-                      ? 'pointer-events-none'
-                      : 'cursor-pointer'
+      {activeTab === 'tarot' ? (
+        <>
+          {/* Main Viewport-Fitted Card Table Area with Full-Width Spread */}
+          <div className="w-full flex-1 flex items-center justify-center min-h-0 px-2 sm:px-6 md:px-10 py-1">
+            <div
+              className="relative w-full aspect-[16/8.2] max-h-[calc(100dvh-130px)] overflow-visible select-none"
+              style={{
+                maxWidth: 'calc((100dvh - 130px) * (16 / 8.2))',
+              }}
+            >
+              {/* Deck Slot Indicator (matches stack position: left: 84.1%, top: 3.5%) */}
+              <div
+                onClick={anyDealt && !isBusy ? handleStack : undefined}
+                className={`absolute rounded-lg sm:rounded-xl border-2 border-dashed border-neutral-200 flex flex-col items-center justify-center text-neutral-300 text-xs font-sans transition-all ${isThreeSelected ? 'opacity-20 blur-[1px]' : ''
+                  } ${anyDealt && !isBusy ? 'hover:border-[#b8bcfa] hover:text-[#1e1b4b] hover:bg-[#d8dbff]/10 cursor-pointer' : 'pointer-events-none'
                   }`}
-                  style={stackOffset}
-                  title={
-                    isDeckStacked
-                      ? 'Click deck to deal cards'
-                      : !isThreeSelected
-                      ? isSelected
-                        ? `Card #${selectionOrder + 1} (Selected - tap to unselect)`
-                        : `Tap to select this card (${selectedCardIds.length}/3)`
-                      : isSelected
-                      ? isFlipped
-                        ? `${card.name} (Revealed)`
-                        : `Card #${selectionOrder + 1} (Tap to flip!)`
-                      : undefined
+                style={{
+                  left: '84.1%',
+                  top: '3.5%',
+                  width: '14.8%',
+                  height: '45.5%',
+                }}
+                title={anyDealt ? 'Click to make a deck' : undefined}
+              >
+                <span className="text-base sm:text-2xl opacity-40">🂠</span>
+                <span className="mt-0.5 font-medium text-[9px] sm:text-[11px] leading-tight text-center px-1">
+                  {anyDealt ? 'Make Deck' : 'Deck Stack'}
+                </span>
+              </div>
+
+              {/* Cards List */}
+              <ul className="relative w-full h-full list-none p-0 m-0 card-perspective">
+                {INITIAL_CARDS.map((card, index) => {
+                  const isDealt = dealtCards[index]
+                  const isSelected = selectedCardIds.includes(card.id)
+                  const isFlipped = revealedCardIds.includes(card.id)
+                  const isDeckStacked = !anyDealt
+                  const selectionOrder = selectedCardIds.indexOf(card.id)
+
+                  // Stack offset when sitting in deck
+                  const stackZIndex = 25 - index
+                  const stackOffset = !isDealt
+                    ? {
+                      transform: `translateY(${-index * 0.5}px) translateX(${index * 0.2}px)`,
+                      zIndex: stackZIndex,
+                    }
+                    : undefined
+
+                  // Determine visual presentation state
+                  let stateClass = ''
+                  if (isDealt) {
+                    if (isThreeSelected) {
+                      if (isSelected) {
+                        const fanIdx = selectedCardIds.indexOf(card.id)
+                        stateClass = `fan-card-${fanIdx}`
+                      } else {
+                        stateClass = 'card-blurred'
+                      }
+                    } else if (isSelected) {
+                      stateClass = 'card-selected-staging'
+                    }
                   }
-                >
-                  {/* Selection Badge for Selected Cards */}
-                  {isSelected && (
-                    <div className="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 z-50 px-1.5 py-0.5 sm:px-2 rounded-full bg-neutral-900 text-white border sm:border-2 border-white shadow-md flex items-center gap-0.5 text-[8px] sm:text-[10px] font-bold tracking-tight">
-                      <span>#{selectionOrder + 1}</span>
-                      {isThreeSelected && !isFlipped && (
-                        <span className="text-[7px] sm:text-[8px] font-normal text-amber-300 uppercase tracking-widest hidden xs:inline">Flip</span>
+
+                  return (
+                    <li
+                      key={card.id}
+                      onClick={() => handleCardClick(card.id)}
+                      className={`card card-item select-none ${isDealt ? `dealt-${index}` : ''
+                        } ${stateClass} ${isDeckStacked
+                          ? 'cursor-pointer hover:-translate-y-1'
+                          : isThreeSelected && !isSelected
+                            ? 'pointer-events-none'
+                            : 'cursor-pointer'
+                        }`}
+                      style={stackOffset}
+                      title={
+                        isDeckStacked
+                          ? 'Click deck to deal cards'
+                          : !isThreeSelected
+                            ? isSelected
+                              ? `Card #${selectionOrder + 1} (Selected - tap to unselect)`
+                              : `Tap to select this card (${selectedCardIds.length}/3)`
+                            : isSelected
+                              ? isFlipped
+                                ? `${card.name} (Revealed)`
+                                : `Card #${selectionOrder + 1} (Tap to flip!)`
+                              : undefined
+                      }
+                    >
+                      {/* Selection Badge for Selected Cards */}
+                      {isSelected && (
+                        <div className="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 z-50 px-1.5 py-0.5 sm:px-2 rounded-full bg-[#1e1b4b] text-[#d8dbff] border sm:border-2 border-white shadow-md flex items-center gap-0.5 text-[8px] sm:text-[10px] font-bold tracking-tight">
+                          <span>#{selectionOrder + 1}</span>
+                          {isThreeSelected && !isFlipped && (
+                            <span className="text-[7px] sm:text-[8px] font-semibold text-[#c4c8fa] uppercase tracking-widest hidden xs:inline">Flip</span>
+                          )}
+                        </div>
                       )}
-                    </div>
-                  )}
 
-                  {/* 3D Inner Card Flipper */}
-                  <div
-                    className={`card-flipper ${isFlipped ? 'is-flipped' : ''} ${
-                      isSelected && !isThreeSelected ? 'ring-1 sm:ring-2 ring-neutral-900 ring-offset-1 sm:ring-offset-2' : ''
-                    }`}
-                  >
-                    {/* BACK FACE (Visible in deck, during selection, and before flipping) */}
-                    <div className="card-face face-back">
-                      <img
-                        src={card.backImage}
-                        alt={`${card.name} Back`}
-                        className="w-full h-full object-fill"
-                        draggable={false}
-                      />
-                    </div>
+                      {/* 3D Inner Card Flipper */}
+                      <div
+                        className={`card-flipper ${isFlipped ? 'is-flipped' : ''} ${isSelected && !isThreeSelected ? 'ring-2 ring-[#818cf8] ring-offset-1 sm:ring-offset-2' : ''
+                          }`}
+                      >
+                        {/* BACK FACE (Visible in deck, during selection, and before flipping) */}
+                        <div className="card-face face-back">
+                          <img
+                            src={card.backImage}
+                            alt={`${card.name} Back`}
+                            className="w-full h-full object-fill"
+                            draggable={false}
+                          />
+                        </div>
 
-                    {/* FRONT FACE (Revealed only when user clicks to flip) */}
-                    <div className="card-face face-front">
-                      <img
-                        src={card.frontImage}
-                        alt={`${card.name} Front`}
-                        className="w-full h-full object-fill"
-                        draggable={false}
-                      />
-                    </div>
-                  </div>
-                </li>
-              )
-            })}
-          </ul>
-        </div>
-      </div>
-
-      {/* Bottom Bar: Centered Single Button "Make a Deck / Deal Cards" */}
-      <footer className="w-full max-w-[1240px] mx-auto px-2 sm:px-4 flex flex-col items-center justify-center gap-1.5 text-xs flex-shrink-0 py-1">
-        {/* Single Button: Perfectly Centered */}
-        <button
-          type="button"
-          onClick={anyDealt ? handleStack : handleStart}
-          disabled={isBusy}
-          className="px-6 py-2 sm:px-8 sm:py-2.5 rounded-xl border border-neutral-300 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-900 text-xs sm:text-sm font-semibold tracking-wide shadow-2xs hover:shadow-xs transition-all cursor-pointer disabled:opacity-40"
-        >
-          {anyDealt ? 'Make a Deck' : 'Deal Cards'}
-        </button>
-
-        {/* Selected 3 Cards Chips (Centered underneath when cards are selected) */}
-        {selectedCards.length > 0 && (
-          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-center animate-fadeIn">
-            <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-neutral-400">
-              Selected ({selectedCardIds.length}/3):
-            </span>
-            <div className="flex flex-wrap gap-1 sm:gap-1.5 justify-center">
-              {selectedCards.map((card, idx) => {
-                const isCardFlipped = revealedCardIds.includes(card.id)
-                return (
-                  <span
-                    key={card.id}
-                    className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-lg border text-xs font-medium flex items-center gap-1 shadow-2xs transition-all ${
-                      isCardFlipped
-                        ? 'bg-neutral-900 text-white border-neutral-900'
-                        : 'bg-neutral-100 text-neutral-800 border-neutral-200'
-                    }`}
-                  >
-                    <span className={`text-[10px] sm:text-xs font-bold ${isCardFlipped ? 'text-amber-300' : 'text-neutral-400'}`}>
-                      #{idx + 1}
-                    </span>
-                    <span className="text-xs sm:text-sm">{isCardFlipped ? card.icon : '🂠'}</span>
-                    <span className="font-medium truncate max-w-[110px] sm:max-w-none">
-                      {isCardFlipped ? card.name : `Card #${idx + 1}`}
-                    </span>
-                  </span>
-                )
-              })}
+                        {/* FRONT FACE (Revealed only when user clicks to flip) */}
+                        <div className="card-face face-front">
+                          <img
+                            src={card.frontImage}
+                            alt={`${card.name} Front`}
+                            className="w-full h-full object-fill"
+                            draggable={false}
+                          />
+                        </div>
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
             </div>
           </div>
-        )}
-      </footer>
+
+          {/* Bottom Bar: Centered Single Button "Make a Deck / Deal Cards" */}
+          <footer className="w-full max-w-[1240px] mx-auto px-2 sm:px-4 flex flex-col items-center justify-center gap-1.5 text-xs flex-shrink-0 py-1">
+            {/* Single Button: Perfectly Centered */}
+            <button
+              type="button"
+              onClick={anyDealt ? handleStack : handleStart}
+              disabled={isBusy}
+              className="px-6 py-2 sm:px-8 sm:py-2.5 rounded-xl border border-[#b8bcfa] bg-white hover:bg-[#d8dbff]/25 active:bg-[#d8dbff]/45 text-[#1e1b4b] text-xs sm:text-sm font-semibold tracking-wide shadow-2xs hover:shadow-xs transition-all cursor-pointer disabled:opacity-40"
+            >
+              {anyDealt ? 'Make a Deck' : 'Deal Cards'}
+            </button>
+
+            {/* Selected 3 Cards Chips (Centered underneath when cards are selected) */}
+            {selectedCards.length > 0 && (
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-center animate-fadeIn">
+                <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-neutral-400">
+                  Selected ({selectedCardIds.length}/3):
+                </span>
+                <div className="flex flex-wrap gap-1 sm:gap-1.5 justify-center">
+                  {selectedCards.map((card, idx) => {
+                    const isCardFlipped = revealedCardIds.includes(card.id)
+                    return (
+                      <span
+                        key={card.id}
+                        className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-lg border text-xs font-medium flex items-center gap-1 shadow-2xs transition-all ${isCardFlipped
+                            ? 'bg-[#d8dbff] text-[#1e1b4b] border-[#b8bcfa] font-semibold'
+                            : 'bg-neutral-100 text-neutral-800 border-neutral-200'
+                          }`}
+                      >
+                        <span className={`text-[10px] sm:text-xs font-bold ${isCardFlipped ? 'text-[#4338ca]' : 'text-neutral-400'}`}>
+                          #{idx + 1}
+                        </span>
+                        <span className="text-xs sm:text-sm">{isCardFlipped ? card.icon : '🂠'}</span>
+                        <span className="font-medium truncate max-w-[110px] sm:max-w-none">
+                          {isCardFlipped ? card.name : `Card #${idx + 1}`}
+                        </span>
+                      </span>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+          </footer>
+        </>
+      ) : activeTab === 'person1' || activeTab === 'person2' ? (
+        <div className="w-full flex-1 flex items-center justify-center p-1 sm:p-3 min-h-0">
+          <ChatView
+            activePersona={activeTab}
+            onSwitchPersona={(persona) => setActiveTab(persona)}
+            onBackToTarot={() => setActiveTab('tarot')}
+            selectedCards={selectedCards}
+            messages={chatMessages}
+            onSendMessage={handleSendMessage}
+            onClearMessages={handleClearMessages}
+          />
+        </div>
+      ) : (
+        <div className="w-full flex-1 overflow-y-auto py-2">
+          <DashboardCalendar />
+        </div>
+      )}
     </div>
   )
 }
