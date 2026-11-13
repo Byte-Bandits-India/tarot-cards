@@ -112,7 +112,7 @@ export default function App() {
       return
     }
 
-    // 3. Reveal Phase (All 3 cards have been selected)
+    // 3. Reveal Phase (All 3 cards have been selected into the fan)
     // Only the 3 selected cards can be clicked and flipped in 3D
     if (isSelected) {
       setRevealedCardIds((prev) =>
@@ -127,31 +127,36 @@ export default function App() {
     .filter((c): c is TarotCardData => Boolean(c))
 
   return (
-    <div className="min-h-screen bg-white text-neutral-900 flex flex-col items-center justify-start p-4 sm:p-6 md:p-8 select-none">
+    <div className="min-h-screen bg-white text-neutral-900 flex flex-col items-center justify-start p-3 sm:p-6 md:p-8 select-none">
       {/* Header */}
-      <header className="w-full max-w-4xl text-center mb-4 sm:mb-6">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold tracking-tight text-neutral-900">
+      <header className="w-full max-w-4xl text-center mb-3 sm:mb-6">
+        <h1 className="text-xl sm:text-3xl md:text-4xl font-serif font-bold tracking-tight text-neutral-900">
           Tarot Cards Spread
         </h1>
       </header>
 
-      {/* Card Table Area */}
-      <div className="w-full max-w-[780px] overflow-x-auto pb-4 flex justify-center">
-        <div className="cards relative w-[736px] min-w-[736px] h-[432px] bg-white rounded-2xl border border-neutral-200 shadow-sm overflow-hidden">
-          {/* Deck Slot Indicator (matches stack position: left 584px, top 31px) */}
+      {/* Fully Mobile-Responsive Fluid Card Table Area */}
+      <div className="w-full max-w-[736px] mx-auto px-1 sm:px-0">
+        <div className="cards relative w-full aspect-[16/9.4] bg-white rounded-xl sm:rounded-2xl border border-neutral-200 shadow-sm overflow-hidden select-none">
+          {/* Deck Slot Indicator (matches stack position: left: 79.35%, top: 7.2%) */}
           <div
             onClick={anyDealt && !isBusy ? handleStack : undefined}
-            className={`absolute w-[120px] h-[175px] rounded-xl border-2 border-dashed border-neutral-200 flex flex-col items-center justify-center text-neutral-300 text-xs font-sans transition-all ${
+            className={`absolute rounded-md sm:rounded-xl border-2 border-dashed border-neutral-200 flex flex-col items-center justify-center text-neutral-300 text-xs font-sans transition-all ${
               isThreeSelected ? 'opacity-20 blur-[1px]' : ''
             } ${
               anyDealt && !isBusy ? 'hover:border-neutral-400 hover:text-neutral-500 cursor-pointer' : 'pointer-events-none'
             }`}
-            style={{ left: '584px', top: '31px' }}
+            style={{
+              left: '79.35%',
+              top: '7.2%',
+              width: '16.3%',
+              height: '40.5%',
+            }}
             title={anyDealt ? 'Click to stack cards back into deck' : undefined}
           >
-            <span className="text-xl opacity-40">🂠</span>
-            <span className="mt-1 font-medium text-[11px]">
-              {anyDealt ? 'Click to Stack' : 'Deck Stack'}
+            <span className="text-sm sm:text-xl opacity-40">🂠</span>
+            <span className="mt-0.5 font-medium text-[9px] sm:text-[11px] leading-tight text-center px-0.5">
+              {anyDealt ? 'Stack' : 'Deck'}
             </span>
           </div>
 
@@ -168,7 +173,7 @@ export default function App() {
               const stackZIndex = 20 - index
               const stackOffset = !isDealt
                 ? {
-                    transform: `translateY(${-index * 0.75}px) translateX(${index * 0.25}px)`,
+                    transform: `translateY(${-index * 0.5}px) translateX(${index * 0.2}px)`,
                     zIndex: stackZIndex,
                   }
                 : undefined
@@ -207,21 +212,21 @@ export default function App() {
                       ? 'Click deck to deal cards'
                       : !isThreeSelected
                       ? isSelected
-                        ? `Card #${selectionOrder + 1} (Selected - click to unselect)`
-                        : `Click to select this card (${selectedCardIds.length}/3)`
+                        ? `Card #${selectionOrder + 1} (Selected - tap to unselect)`
+                        : `Tap to select this card (${selectedCardIds.length}/3)`
                       : isSelected
                       ? isFlipped
                         ? `${card.name} (Revealed)`
-                        : `Card #${selectionOrder + 1} (Click to flip and reveal!)`
+                        : `Card #${selectionOrder + 1} (Tap to flip!)`
                       : undefined
                   }
                 >
                   {/* Selection Badge for Selected Cards */}
                   {isSelected && (
-                    <div className="absolute -top-2.5 -right-2.5 z-50 px-2 py-0.5 rounded-full bg-neutral-900 text-white border-2 border-white shadow-md flex items-center gap-1 text-[10px] font-bold tracking-tight">
+                    <div className="absolute -top-1.5 -right-1.5 sm:-top-2.5 sm:-right-2.5 z-50 px-1.5 py-0.5 sm:px-2 rounded-full bg-neutral-900 text-white border sm:border-2 border-white shadow-md flex items-center gap-0.5 text-[8px] sm:text-[10px] font-bold tracking-tight">
                       <span>#{selectionOrder + 1}</span>
                       {isThreeSelected && !isFlipped && (
-                        <span className="text-[8px] font-normal text-amber-300 uppercase tracking-widest hidden sm:inline">Flip</span>
+                        <span className="text-[7px] sm:text-[8px] font-normal text-amber-300 uppercase tracking-widest hidden xs:inline">Flip</span>
                       )}
                     </div>
                   )}
@@ -229,7 +234,7 @@ export default function App() {
                   {/* 3D Inner Card Flipper */}
                   <div
                     className={`card-flipper ${isFlipped ? 'is-flipped' : ''} ${
-                      isSelected && !isThreeSelected ? 'ring-2 ring-neutral-900 ring-offset-2' : ''
+                      isSelected && !isThreeSelected ? 'ring-1 sm:ring-2 ring-neutral-900 ring-offset-1 sm:ring-offset-2' : ''
                     }`}
                   >
                     {/* BACK FACE (Visible in deck, during selection, and before flipping) */}
@@ -259,32 +264,33 @@ export default function App() {
         </div>
       </div>
 
-      {/* Selected 3 Cards Bar & Actions */}
-      <div className="w-full max-w-[736px] mt-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
-            Selected Cards ({selectedCardIds.length}/3):
+      {/* Selected 3 Cards Bar & Mobile-Friendly Action Buttons */}
+      <div className="w-full max-w-[736px] mx-auto px-1 sm:px-0 mt-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 text-xs sm:text-sm">
+        {/* Chips */}
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap justify-center sm:justify-start">
+          <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-neutral-400">
+            Selected ({selectedCardIds.length}/3):
           </span>
           {selectedCards.length === 0 ? (
-            <span className="text-xs text-neutral-400 italic">None yet</span>
+            <span className="text-[11px] sm:text-xs text-neutral-400 italic">None yet</span>
           ) : (
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1 sm:gap-1.5">
               {selectedCards.map((card, idx) => {
                 const isCardFlipped = revealedCardIds.includes(card.id)
                 return (
                   <span
                     key={card.id}
-                    className={`px-2.5 py-1 rounded-md border text-xs font-medium flex items-center gap-1.5 shadow-2xs transition-all ${
+                    className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md border text-[11px] sm:text-xs font-medium flex items-center gap-1 shadow-2xs transition-all ${
                       isCardFlipped
                         ? 'bg-neutral-900 text-white border-neutral-900'
                         : 'bg-neutral-100 text-neutral-800 border-neutral-200'
                     }`}
                   >
-                    <span className={`text-[10px] font-bold ${isCardFlipped ? 'text-amber-300' : 'text-neutral-400'}`}>
+                    <span className={`text-[9px] sm:text-[10px] font-bold ${isCardFlipped ? 'text-amber-300' : 'text-neutral-400'}`}>
                       #{idx + 1}
                     </span>
                     <span>{isCardFlipped ? card.icon : '🂠'}</span>
-                    <span>{isCardFlipped ? card.name : `Card #${idx + 1}`}</span>
+                    <span className="truncate max-w-[90px] sm:max-w-none">{isCardFlipped ? card.name : `Card #${idx + 1}`}</span>
                   </span>
                 )
               })}
@@ -293,13 +299,13 @@ export default function App() {
         </div>
 
         {/* Action Controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center sm:justify-end gap-1.5 sm:gap-2 flex-wrap">
           {/* Quick Reveal All (Visible when 3 cards selected and not all revealed) */}
           {isThreeSelected && revealedCardIds.length < 3 && (
             <button
               type="button"
               onClick={handleRevealAll}
-              className="px-3.5 py-1.5 rounded-lg border border-neutral-300 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-700 text-xs font-medium shadow-2xs transition-all cursor-pointer"
+              className="flex-1 sm:flex-initial px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-lg border border-neutral-300 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-700 text-xs font-medium shadow-2xs transition-all cursor-pointer min-h-[34px]"
             >
               Reveal All 3
             </button>
@@ -310,7 +316,7 @@ export default function App() {
             <button
               type="button"
               onClick={handleReselect}
-              className="px-3.5 py-1.5 rounded-lg border border-neutral-300 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-700 text-xs font-medium shadow-2xs transition-all cursor-pointer"
+              className="flex-1 sm:flex-initial px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-lg border border-neutral-300 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-700 text-xs font-medium shadow-2xs transition-all cursor-pointer min-h-[34px]"
             >
               Reselect
             </button>
@@ -322,7 +328,7 @@ export default function App() {
               type="button"
               onClick={handleStack}
               disabled={isBusy}
-              className="px-3.5 py-1.5 rounded-lg border border-neutral-300 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-700 text-xs font-semibold shadow-2xs transition-all cursor-pointer disabled:opacity-40"
+              className="flex-1 sm:flex-initial px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-lg border border-neutral-300 bg-white hover:bg-neutral-50 active:bg-neutral-100 text-neutral-700 text-xs font-semibold shadow-2xs transition-all cursor-pointer disabled:opacity-40 min-h-[34px]"
             >
               Stack Deck
             </button>
