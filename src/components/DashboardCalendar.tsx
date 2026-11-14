@@ -19,6 +19,7 @@ import {
   User,
   Users,
   Layers,
+  ArrowLeft,
   Plus,
   Flag,
   type LucideIcon,
@@ -136,7 +137,11 @@ function renderTooltip({
   )
 }
 
-export function DashboardCalendar() {
+export interface DashboardCalendarProps {
+  onBackToTarot?: () => void
+}
+
+export function DashboardCalendar({ onBackToTarot }: DashboardCalendarProps = {}) {
   const events = useMemo(() => buildDashboardEvents(new Date()), [])
   const apiRef = useRef<EventCalendarApi<EventData> | null>(null)
   const counter = useRef(0)
@@ -177,6 +182,44 @@ export function DashboardCalendar() {
 
   return (
     <div className="w-full max-w-6xl mx-auto p-2 sm:p-4 animate-fadeIn select-none flex flex-col gap-3">
+      {/* Top Header */}
+      <div className="flex items-center justify-between gap-3 bg-white p-3 sm:p-4 rounded-2xl border border-neutral-200 shadow-xs flex-shrink-0">
+        <div className="flex items-center gap-3">
+          {onBackToTarot && (
+            <button
+              type="button"
+              onClick={onBackToTarot}
+              className="p-1.5 rounded-lg border border-neutral-200 hover:bg-[#d8dbff]/30 hover:border-[#b8bcfa] text-[#1e1b4b] transition-colors cursor-pointer"
+              title="Back to Tarot Cards Spread"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+          )}
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="font-serif font-bold text-base sm:text-lg text-neutral-900 leading-tight">
+                Dashboard & Reading Schedule
+              </h2>
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#d8dbff] text-[#1e1b4b] border border-[#b8bcfa] hidden sm:inline">
+                Reading Calendar
+              </span>
+            </div>
+            <p className="text-[11px] text-neutral-500 hidden sm:block">
+              Track multi-day reading sessions, consultations, and card milestones.
+            </p>
+          </div>
+        </div>
+
+        {onBackToTarot && (
+          <button
+            type="button"
+            onClick={onBackToTarot}
+            className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-[#b8bcfa] bg-[#d8dbff]/30 hover:bg-[#d8dbff] text-[#1e1b4b] shadow-2xs transition-colors cursor-pointer"
+          >
+            Open Cards Spread
+          </button>
+        )}
+      </div>
 
       {/* Event Calendar Card */}
       <Card className="w-full bg-white border border-neutral-200 rounded-2xl shadow-xs overflow-hidden py-0">

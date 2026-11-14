@@ -32,8 +32,8 @@ const frontImagePool = [
   card3Img, // 11: Justice
 ]
 
-// 12 Cards (0 to 11) using the user's back.png for every card
-export const INITIAL_CARDS: TarotCardData[] = [
+// 22 Major Arcana Cards (0 to 21) using the user's back.png for every card
+export const MAJOR_ARCANA_CARDS: TarotCardData[] = [
   {
     id: 0,
     name: 'The Fool',
@@ -67,7 +67,7 @@ export const INITIAL_CARDS: TarotCardData[] = [
     numeral: 'III',
     icon: '🌿',
     subtitle: 'Abundance & Nature',
-    frontImage: frontImagePool[3],
+    frontImage: frontImagePool[0],
     backImage: DEFAULT_CARD_BACK,
   },
   {
@@ -76,7 +76,7 @@ export const INITIAL_CARDS: TarotCardData[] = [
     numeral: 'IV',
     icon: '👑',
     subtitle: 'Authority & Structure',
-    frontImage: frontImagePool[4],
+    frontImage: frontImagePool[1],
     backImage: DEFAULT_CARD_BACK,
   },
   {
@@ -85,7 +85,7 @@ export const INITIAL_CARDS: TarotCardData[] = [
     numeral: 'V',
     icon: '🗝️',
     subtitle: 'Wisdom & Tradition',
-    frontImage: frontImagePool[5],
+    frontImage: frontImagePool[2],
     backImage: DEFAULT_CARD_BACK,
   },
   {
@@ -94,7 +94,7 @@ export const INITIAL_CARDS: TarotCardData[] = [
     numeral: 'VI',
     icon: '💞',
     subtitle: 'Harmony & Choice',
-    frontImage: frontImagePool[6],
+    frontImage: frontImagePool[0],
     backImage: DEFAULT_CARD_BACK,
   },
   {
@@ -103,7 +103,7 @@ export const INITIAL_CARDS: TarotCardData[] = [
     numeral: 'VII',
     icon: '⚔️',
     subtitle: 'Determination & Victory',
-    frontImage: frontImagePool[7],
+    frontImage: frontImagePool[1],
     backImage: DEFAULT_CARD_BACK,
   },
   {
@@ -112,7 +112,7 @@ export const INITIAL_CARDS: TarotCardData[] = [
     numeral: 'VIII',
     icon: '🦁',
     subtitle: 'Courage & Patience',
-    frontImage: frontImagePool[8],
+    frontImage: frontImagePool[2],
     backImage: DEFAULT_CARD_BACK,
   },
   {
@@ -121,7 +121,7 @@ export const INITIAL_CARDS: TarotCardData[] = [
     numeral: 'IX',
     icon: '🏮',
     subtitle: 'Soul Searching & Truth',
-    frontImage: frontImagePool[9],
+    frontImage: frontImagePool[0],
     backImage: DEFAULT_CARD_BACK,
   },
   {
@@ -130,7 +130,7 @@ export const INITIAL_CARDS: TarotCardData[] = [
     numeral: 'X',
     icon: '🎡',
     subtitle: 'Destiny & Cycles',
-    frontImage: frontImagePool[10],
+    frontImage: frontImagePool[1],
     backImage: DEFAULT_CARD_BACK,
   },
   {
@@ -139,7 +139,143 @@ export const INITIAL_CARDS: TarotCardData[] = [
     numeral: 'XI',
     icon: '⚖️',
     subtitle: 'Truth & Fairness',
-    frontImage: frontImagePool[11],
+    frontImage: frontImagePool[2],
+    backImage: DEFAULT_CARD_BACK,
+  },
+  {
+    id: 12,
+    name: 'The Hanged Man',
+    numeral: 'XII',
+    icon: '⏳',
+    subtitle: 'Surrender & New Perspective',
+    frontImage: frontImagePool[0],
+    backImage: DEFAULT_CARD_BACK,
+  },
+  {
+    id: 13,
+    name: 'Death',
+    numeral: 'XIII',
+    icon: '🦋',
+    subtitle: 'Transformation & Rebirth',
+    frontImage: frontImagePool[1],
+    backImage: DEFAULT_CARD_BACK,
+  },
+  {
+    id: 14,
+    name: 'Temperance',
+    numeral: 'XIV',
+    icon: '🌊',
+    subtitle: 'Balance & Moderation',
+    frontImage: frontImagePool[2],
+    backImage: DEFAULT_CARD_BACK,
+  },
+  {
+    id: 15,
+    name: 'The Devil',
+    numeral: 'XV',
+    icon: '🔥',
+    subtitle: 'Shadow & Inner Freedom',
+    frontImage: frontImagePool[0],
+    backImage: DEFAULT_CARD_BACK,
+  },
+  {
+    id: 16,
+    name: 'The Tower',
+    numeral: 'XVI',
+    icon: '⚡',
+    subtitle: 'Awakening & Sudden Change',
+    frontImage: frontImagePool[1],
+    backImage: DEFAULT_CARD_BACK,
+  },
+  {
+    id: 17,
+    name: 'The Star',
+    numeral: 'XVII',
+    icon: '⭐',
+    subtitle: 'Hope & Divine Inspiration',
+    frontImage: frontImagePool[2],
+    backImage: DEFAULT_CARD_BACK,
+  },
+  {
+    id: 18,
+    name: 'The Moon',
+    numeral: 'XVIII',
+    icon: '🌕',
+    subtitle: 'Intuition & Subconscious',
+    frontImage: frontImagePool[0],
+    backImage: DEFAULT_CARD_BACK,
+  },
+  {
+    id: 19,
+    name: 'The Sun',
+    numeral: 'XIX',
+    icon: '☀️',
+    subtitle: 'Vitality, Joy & Success',
+    frontImage: frontImagePool[1],
+    backImage: DEFAULT_CARD_BACK,
+  },
+  {
+    id: 20,
+    name: 'Judgement',
+    numeral: 'XX',
+    icon: '🎺',
+    subtitle: 'Awakening & Reckoning',
+    frontImage: frontImagePool[2],
+    backImage: DEFAULT_CARD_BACK,
+  },
+  {
+    id: 21,
+    name: 'The World',
+    numeral: 'XXI',
+    icon: '🌍',
+    subtitle: 'Completion & Wholeness',
+    frontImage: frontImagePool[0],
     backImage: DEFAULT_CARD_BACK,
   },
 ]
+
+// 56 Minor Arcana Cards (Wands, Cups, Swords, Pentacles) to complete the 78 Tarot Deck
+const SUITS = [
+  { name: 'Wands', icon: '🪄', subtitle: 'Action & Passion' },
+  { name: 'Cups', icon: '🏆', subtitle: 'Love & Emotion' },
+  { name: 'Swords', icon: '⚔️', subtitle: 'Truth & Clarity' },
+  { name: 'Pentacles', icon: '🪙', subtitle: 'Prosperity & Grounding' },
+]
+
+const RANKS = [
+  { name: 'Ace', numeral: 'I' },
+  { name: 'Two', numeral: 'II' },
+  { name: 'Three', numeral: 'III' },
+  { name: 'Four', numeral: 'IV' },
+  { name: 'Five', numeral: 'V' },
+  { name: 'Six', numeral: 'VI' },
+  { name: 'Seven', numeral: 'VII' },
+  { name: 'Eight', numeral: 'VIII' },
+  { name: 'Nine', numeral: 'IX' },
+  { name: 'Ten', numeral: 'X' },
+  { name: 'Page', numeral: 'P' },
+  { name: 'Knight', numeral: 'Kn' },
+  { name: 'Queen', numeral: 'Q' },
+  { name: 'King', numeral: 'K' },
+]
+
+const MINOR_ARCANA_CARDS: TarotCardData[] = []
+let minorId = 22
+SUITS.forEach((suit, suitIdx) => {
+  RANKS.forEach((rank, rankIdx) => {
+    const imgIndex = (suitIdx * 14 + rankIdx) % frontImagePool.length
+    MINOR_ARCANA_CARDS.push({
+      id: minorId++,
+      name: `${rank.name} of ${suit.name}`,
+      numeral: rank.numeral,
+      icon: suit.icon,
+      subtitle: suit.subtitle,
+      frontImage: frontImagePool[imgIndex],
+      backImage: DEFAULT_CARD_BACK,
+    })
+  })
+})
+
+// Complete 78 Tarot Cards Deck
+export const FULL_TAROT_DECK: TarotCardData[] = [...MAJOR_ARCANA_CARDS, ...MINOR_ARCANA_CARDS]
+export const INITIAL_CARDS: TarotCardData[] = FULL_TAROT_DECK
