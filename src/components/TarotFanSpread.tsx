@@ -6,7 +6,6 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
-  MessageSquare,
 } from 'lucide-react'
 import { INITIAL_CARDS, type TarotCardData } from '@/cardsData'
 import { cn } from '@/lib/utils'
@@ -34,7 +33,6 @@ export function TarotFanSpread({
   onToggleReveal,
   onRevealAll,
   onResetSpread,
-  onNavigateToChat,
 }: TarotFanSpreadProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const fanTrackRef = useRef<HTMLDivElement>(null)
